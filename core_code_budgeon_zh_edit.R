@@ -7,7 +7,7 @@ library(reshape2)
 library(minqa)
 library(plyr)
 
-## Run Fn_sample_IVEC_ADNI.R before this
+## Run functions_budgeon_zh_edit.R before this
 
 adni_merge<-ADNIMERGE::adnimerge
 
@@ -36,6 +36,7 @@ amy.data.bridge <- amy.data.bridge %>% dplyr::mutate(.,DX_bl=with(.,dplyr::case_
   (DX_bl == "AD") ~ "AD")
 ))
 
+##DX_alt is correct
 amy.data.bridge <- amy.data.bridge %>% dplyr::mutate(.,DX_alt=with(.,dplyr::case_when(
   (Dx %in% c("MCI","MCI_neg")) ~ "MCI",
   (Dx %in% c("CN_neg","CN")) ~ "CN",
@@ -149,7 +150,7 @@ for (i in 1:n.bs){
   ## Fixed bootstrap problem noted in original file
   data.bs.test<-dplyr::left_join(ID.use.test,data.use %>% dplyr::mutate(RID=as.numeric(RID)),by="RID")
   data.bs.test <- data.bs.test[order(data.bs.test$ID, data.bs.test$TIME),]
-  data.bs.test <- rename(data.bs.test, c("RID"="OLD_RID", "ID"="RID"))
+  data.bs.test <- dplyr::rename(data.bs.test, OLD_RID=RID, RID=ID)
   
   reg.out.BS <- reg.fn(dat=data.bs.test,
                        ID.uniq=unique(data.bs.test$RID),
