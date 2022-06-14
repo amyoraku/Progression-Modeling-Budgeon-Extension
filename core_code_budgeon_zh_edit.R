@@ -205,16 +205,20 @@ perc.97.5.BS <- apply(out.y.int.bs, 1, quantile, probs = 0.975,  na.rm = TRUE)
 #COMBINING WITH X SEQUENCE 
 data.conf <- cbind(xgr.seq, perc.5.BS,perc.2.5.BS,perc.50.BS,perc.95.BS,perc.97.5.BS)
 
-## weird plotting stuff below - we can definitely improve on it, but it's a proof of concept
-dat.ADNI <- data.use[data.use$TIME==0,]
+## Plotting wit ggplot
+plot_data <- data.frame(xgr.seq, int.out$y.int) #xgr.seq is on the y axis, int.out on x axis
 
-dat.ADNI$DX_bl <- ordered(dat.ADNI$DX_bl, levels = c("HC", "MCI", "AD"))
+conf_1_cols <- c(1, 3)
+conf_2_cols <- c(1, 6)
 
-par(fig=c(0.15,1,0,1),mar=c(4,2,2,2))
-plot(xgr.seq~int.out$y.int,type="l",
-     xlim=c(0,max(int.out$y.int)+10),
-     ylim=c(min(xgr.seq), max(dat.ADNI$response)+10),
-     ylab="",xlab="Disease Progression (years)",
-     lwd=2,col="black",main="",mgp=c(2,1,0),cex.lab=1.3,cex.axis=1.2)
-lines(data.conf[,1]~data.conf[,3],lty=2)
-lines(data.conf[,1]~data.conf[,6],lty=2)
+conf_1_data <- as.data.frame(data.conf[, conf_1_cols])
+conf_2_data <- as.data.frame(data.conf[, conf_2_cols])
+
+test_plot <- ggplot(plot_data, aes(int.out.y.int, xgr.seq)) +
+  geom_line() + 
+  geom_line(aes(perc.2.5.BS, xgr.seq), data = conf_1_data, linetype = "dashed") + 
+  geom_line(aes(perc.97.5.BS, xgr.seq), data = conf_2_data, linetype = "dashed") +
+  xlab("Disease Progression (years)") +
+  ylab("") + 
+  theme_classic()
+test_plot
